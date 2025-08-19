@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZBeast Studio</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+    body {
+      background: #000;
+      color: #eee;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      line-height: 1.5;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 3px;
+    }
+    button {
+      font-family: inherit;
+      border: none;
+      background: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    header {
+      background: #111;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow:
+        0 1px 4px rgba(255 255 255 / 0.08),
+        0 6px 12px rgba(255 255 255 / 0.04);
+    }
+    .logo-title-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid #eee;
+      object-fit: cover;
+      transition: box-shadow 0.3s ease;
+      flex-shrink: 0;
+    }
+    .logo:hover {
+      box-shadow: 0 0 12px 3px #fff;
+    }
+    h1.site-title {
+      font-weight: 700;
+      font-size: 2rem;
+      background: linear-gradient(90deg, #fff, #bbb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      user-select: text;
+      white-space: nowrap;
+    }
+    nav {
+      position: relative;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links li a {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #ddd;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+    .nav-links li a::after {
+      content: "";
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #fff;
+      transition: width 0.3s ease;
+    }
+    .nav-links li a:hover,
+    .nav-links li a:focus-visible {
+      color: #fff;
+    }
+    .nav-links li a:hover::after,
+    .nav-links li a:focus-visible::after {
+      width: 100%;
+    }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      width: 26px;
+      height: 22px;
+    }
+    .hamburger span {
+      display: block;
+      height: 3px;
+      background: #eee;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    .hamburger.active span:nth-child(1) {
+      transform: translateY(9.5px) rotate(45deg);
+    }
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+      transform: translateY(-9.5px) rotate(-45deg);
+    }
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        right: -100%;
+        width: 60vw;
+        max-width: 280px;
+        height: calc(100% - 70px);
+        background: #111;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 2rem 1rem;
+        box-shadow: -2px 0 16px rgba(255 255 255 / 0.05);
+        transition: right 0.3s ease;
+        z-index: 999;
+      }
+      .nav-links.open {
+        right: 0;
+      }
+      .hamburger {
+        display: flex;
+      }
+    }
+    main.container {
+      max-width: 960px;
+      margin: 3rem auto 4rem;
+      padding: 0 1rem;
+    }
+    article.app-card {
+      background: #1e1e1e;
+      border-radius: 20px;
+      border: 1px solid #333;
+      padding: 2rem;
+      box-shadow:
+        0 8px 16px rgba(255 255 255 / 0.04),
+        inset 0 0 0 1px #222;
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: default;
+      user-select: none;
+      overflow: hidden;
+    }
+    article.app-card:hover,
+    article.app-card:focus-within {
+      transform: translateY(-10px);
+      box-shadow:
+        0 16px 32px rgba(255 255 255 / 0.12),
+        inset 0 0 0 1px #444;
+      outline: none;
+    }
+    .app-logo {
+      flex-shrink: 0;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2px solid #eee;
+      object-fit: cover;
+      transition: box-shadow 0.3s ease;
+    }
+    article.app-card:hover .app-logo {
+      box-shadow: 0 0 15px 5px #fff;
+    }
+    .app-info {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .app-title {
+      font-weight: 700;
+      font-size: 2rem;
+      color: #f5f5f5;
+      user-select: text;
+      line-height: 1.2;
+    }
+    .app-description {
+      color: #bbb;
+      font-size: 1.1rem;
+      line-height: 1.4;
+      user-select: text;
+    }
+    .app-version {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #aaa;
+      margin-top: 0.4rem;
+      user-select: text;
+    }
+    .app-features {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: #ccc;
+      user-select: text;
+      list-style: inside disc;
+      line-height: 1.5;
+    }
+    .app-link {
+      margin-top: auto;
+      align-self: flex-start;
+      padding: 0.8rem 1.8rem;
+      border-radius: 35px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #000;
+      background: linear-gradient(90deg, #fff, #ccc);
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(255 255 255 / 0.3);
+      transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.2s ease;
+      user-select: none;
+      position: relative;
+      z-index: 10;
+    }
+    .app-link:hover, .app-link:focus {
+      background: #fff;
+      color: #111;
+      box-shadow: 0 6px 14px rgba(255 255 255 / 0.6);
+      transform: scale(1.05);
+      outline: none;
+    }
+    footer {
+      background-color: #111;
+      color: #666;
+      font-size: 0.9rem;
+      padding: 2rem;
+      text-align: center;
+      user-select: none;
+      box-shadow: inset 0 1px 0 #222;
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    footer a {
+      color: #ccc;
+      font-size: 2rem;
+      transition: color 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+    footer a:hover,
+    footer a:focus {
+      color: #fff;
+      outline: none;
+    }
+    footer .instagram-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 22px;
+      box-shadow:
+        0 0 5px rgba(253, 89, 73, 0.7),
+        0 0 15px rgba(214, 36, 159, 0.6);
+      transition: box-shadow 0.3s ease;
+    }
+    footer .instagram-logo:hover {
+      box-shadow:
+        0 0 8px rgba(253, 89, 73, 1),
+        0 0 25px rgba(214, 36, 159, 0.9);
+    }
+    #scrollTopBtn {
+      position: fixed;
+      bottom: 2.5rem;
+      right: 2.5rem;
+      background: linear-gradient(90deg, #fff, #ccc);
+      color: #000;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      border: none;
+      box-shadow: 0 4px 10px rgba(255 255 255 / 0.3);
+      font-size: 1.5rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 3000;
+      transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.3s ease;
+    }
+    #scrollTopBtn:hover,
+    #scrollTopBtn:focus {
+      background: #fff;
+      color: #111;
+      box-shadow: 0 6px 14px rgba(255 255 255 / 0.6);
+      transform: scale(1.1);
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-title-container">
+      <img src="zbeaststudio.png" alt="ZBeast Studio" class="logo" />
+      <h1 class="site-title">ZBeast Studio</h1>
+    </div>
+    <nav role="navigation" aria-label="Ana Menü">
+      <ul class="nav-links">
+        <li><a href="#apps" tabindex="0">Uygulamalar</a></li>
+        <li><a href="/donate/" tabindex="0">Bağış</a></li>
+        <li><a href="#about" tabindex="0">Hakkımızda</a></li>
+      </ul>
+      <button aria-label="Menüyü aç/kapat" class="hamburger" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="container" id="apps">
+    <article class="app-card" tabindex="0"
+      data-app-title="ZBeast - QR Scanner"
+      data-app-description="Modern ve kullanıcı dostu bir QR Okuyucu uygulaması. Hızlı ve güvenilir QR kod tarama deneyimi sunar."
+      data-app-version="Sürüm: 2.4"
+      data-app-features="• Hızlı QR kod tarama\n• Otomatik odaklanma\n• Geçmiş tarama kayıtları\n• Reklamsız kullanım">
+
+      <img src="zbeastqrscanner.png" alt="ZBeast QR Scanner" class="app-logo" />
+
+      <div class="app-info">
+        <h2 class="app-title">ZBeast - QR Scanner</h2>
+        <p class="app-description">Modern ve kullanıcı dostu bir QR Okuyucu uygulaması.</p>
+        <p class="app-version">Sürüm: 2.4</p>
+        <ul class="app-features">
+          <li>Hızlı QR kod tarama</li>
+          <li>Otomatik odaklanma</li>
+          <li>Geçmiş tarama kayıtları</li>
+          <li>Reklamsız kullanım</li>
+        </ul>
+        <a href="https://drive.usercontent.google.com/u/0/uc?id=1-afr_fAMB4kWZHpcQXqjOarVhB4pSMkn&export=download" class="app-link" target="_blank" rel="noopener noreferrer" aria-label="ZBeast - QR Scanner indir">İndir</a>
+      </div>
+    </article>
+  </main>
+
+  <main class="container" id="apps">
+    <article class="app-card" tabindex="0"
+      data-app-title="Usbkey - HOAL"
+      data-app-description="Hilmi Özcan Anadolu Lisesindeki tüm akıllı tahtaları açabilir..."
+      data-app-version="Sürüm: 1.0"
+      data-app-features="• Uzaktan şifre üretim\n• Sınırsız kullanım\n• Basit kullanıcı arayüzü\n• Reklamsız kullanım">
+
+      <img src="usbkeyhoal.png" alt="Usbkey HOAL" class="app-logo" />
+
+      <div class="app-info">
+        <h2 class="app-title">Usbkey - HOAL</h2>
+        <p class="app-description">Hilmi Özcan Anadolu Lisesindeki tüm akıllı tahtaları açabilir...</p>
+        <p class="app-version">Sürüm: 1.0</p>
+        <ul class="app-features">
+          <li>Uzaktan şifre üretim</li>
+          <li>Sınırsız kullanım</li>
+          <li>Basit kullanıcı arayüzü</li>
+          <li>Reklamsız kullanım</li>
+        </ul>
+        <a href="https://drive.usercontent.google.com/u/0/uc?id=1eSWb_WYs-aYdvzlLIN9yig1JQlnhlZw5&export=download" class="app-link" target="_blank" rel="noopener noreferrer" aria-label="ZBeast - QR Scanner indir">İndir</a>
+      </div>
+    </article>
+  </main>
+
+  <section id="about" style="max-width: 900px; margin: 0 auto 4rem; padding: 0 1rem;">
+    <h2 style="text-align: center; font-weight: 700; font-size: 2rem; margin-bottom: 1rem; background: linear-gradient(90deg, #fff, #bbb); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      Hakkımızda
+    </h2>
+    <p style="color: #ccc; font-size: 1.1rem; line-height: 1.6; user-select: text;">
+      ZBeast Studio olarak, yenilikçi, kullanıcı dostu ve güvenli uygulamalar geliştiriyoruz. Amacımız, teknoloji ile hayatınızı kolaylaştırmak ve dijital dünyada fark yaratmaktır. Her projemizde kaliteyi ön planda tutuyor, modern tasarım ve gelişmiş teknolojiler kullanıyoruz.
+    </p>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 ZBeast Studio. Tüm hakları saklıdır.</p>
+    <div aria-label="Sosyal medya bağlantısı">
+      <a href="https://www.instagram.com/zbeaststudio" aria-label="Instagram" target="_blank" rel="noopener noreferrer" class="instagram-logo" tabindex="0" title="Instagram">
+        <!-- Basit Instagram ikonu -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="white" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 1.5A4.25 4.25 0 003.5 7.75v8.5A4.25 4.25 0 007.75 20.5h8.5a4.25 4.25 0 004.25-4.25v-8.5A4.25 4.25 0 0016.25 3.5h-8.5zm8.75 2a1 1 0 110 2 1 1 0 010-2zM12 7a5 5 0 110 10 5 5 0 010-10zm0 1.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z"/>
+        </svg>
+      </a>
+    </div>
+  </footer>
+
+  <button id="scrollTopBtn" aria-label="Sayfanın üstüne çık">&#8679;</button>
+
+  <script>
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+
+    hamburger.addEventListener('click', () => {
+      const expanded = hamburger.getAttribute('aria-expanded') === 'true' || false;
+      hamburger.setAttribute('aria-expanded', !expanded);
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('open');
+    });
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        if(navLinks.classList.contains('open')) {
+          hamburger.classList.remove('active');
+          hamburger.setAttribute('aria-expanded', false);
+          navLinks.classList.remove('open');
+        }
+      });
+    });
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+      if(window.scrollY > 400) {
+        scrollBtn.style.display = 'flex';
+      } else {
+        scrollBtn.style.display = 'none';
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+      scrollBtn.blur();
+    });
+  </script>
+</body>
+</html>
