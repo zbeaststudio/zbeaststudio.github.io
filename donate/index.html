@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZBeast Studio - Bağış</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+    body {
+      background: #000;
+      color: #eee;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      line-height: 1.5;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 3px;
+    }
+    button {
+      font-family: inherit;
+      border: none;
+      background: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    header {
+      background: #111;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow:
+        0 1px 4px rgba(255 255 255 / 0.08),
+        0 6px 12px rgba(255 255 255 / 0.04);
+    }
+    .logo-title-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid #eee;
+      object-fit: cover;
+      transition: box-shadow 0.3s ease;
+      flex-shrink: 0;
+    }
+    .logo:hover {
+      box-shadow: 0 0 12px 3px #fff;
+    }
+    h1.site-title {
+      font-weight: 700;
+      font-size: 2rem;
+      background: linear-gradient(90deg, #fff, #bbb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      user-select: text;
+      white-space: nowrap;
+    }
+    nav {
+      position: relative;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links li a {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #ddd;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+    .nav-links li a::after {
+      content: "";
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #fff;
+      transition: width 0.3s ease;
+    }
+    .nav-links li a:hover,
+    .nav-links li a:focus-visible {
+      color: #fff;
+    }
+    .nav-links li a:hover::after,
+    .nav-links li a:focus-visible::after {
+      width: 100%;
+    }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      width: 26px;
+      height: 22px;
+    }
+    .hamburger span {
+      display: block;
+      height: 3px;
+      background: #eee;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    .hamburger.active span:nth-child(1) {
+      transform: translateY(9.5px) rotate(45deg);
+    }
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+      transform: translateY(-9.5px) rotate(-45deg);
+    }
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        right: -100%;
+        width: 60vw;
+        max-width: 280px;
+        height: calc(100% - 70px);
+        background: #111;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 2rem 1rem;
+        box-shadow: -2px 0 16px rgba(255 255 255 / 0.05);
+        transition: right 0.3s ease;
+        z-index: 999;
+      }
+      .nav-links.open {
+        right: 0;
+      }
+      .hamburger {
+        display: flex;
+      }
+    }
+    main.container {
+      max-width: 960px;
+      margin: 3rem auto 4rem;
+      padding: 0 1rem;
+      flex-grow: 1;
+    }
+    .donation-card {
+      background: #1e1e1e;
+      border-radius: 20px;
+      border: 1px solid #333;
+      padding: 2rem;
+      box-shadow:
+        0 8px 16px rgba(255 255 255 / 0.04),
+        inset 0 0 0 1px #222;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .donation-card h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, #fff, #bbb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      user-select: text;
+    }
+    .donation-card p {
+      font-size: 1.1rem;
+      color: #ccc;
+      user-select: text;
+    }
+    .iban-box {
+      margin: 2rem 0;
+      background: #222;
+      border: 1px dashed #555;
+      padding: 1.5rem;
+      border-radius: 12px;
+    }
+    .iban-box p {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    .iban-number {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      user-select: all;
+    }
+    .copy-btn {
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      background: #fff;
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
+      user-select: none;
+    }
+    .copy-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    }
+    footer {
+      background-color: #111;
+      color: #666;
+      font-size: 0.9rem;
+      padding: 2rem;
+      text-align: center;
+      user-select: none;
+      box-shadow: inset 0 1px 0 #222;
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    footer a {
+      color: #ccc;
+      font-size: 2rem;
+      transition: color 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+    footer a:hover,
+    footer a:focus {
+      color: #fff;
+      outline: none;
+    }
+    footer .instagram-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 22px;
+      box-shadow:
+        0 0 5px rgba(253, 89, 73, 0.7),
+        0 0 15px rgba(214, 36, 159, 0.6);
+      transition: box-shadow 0.3s ease;
+    }
+    footer .instagram-logo:hover {
+      box-shadow:
+        0 0 8px rgba(253, 89, 73, 1),
+        0 0 25px rgba(214, 36, 159, 0.9);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-title-container">
+      <img src="/zbeaststudio.png" alt="ZBeast Studio" class="logo" />
+      <h1 class="site-title">ZBeast Studio</h1>
+    </div>
+    <nav role="navigation" aria-label="Ana Menü">
+      <ul class="nav-links">
+        <li><a href="/" tabindex="0">Uygulamalar</a></li>
+        <li><a href="/donate/" tabindex="0">Bağış</a></li>
+        <li><a href="/#about" tabindex="0">Hakkımızda</a></li>
+      </ul>
+      <button aria-label="Menüyü aç/kapat" class="hamburger" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="donation-card">
+      <h2>Bize Destek Olun</h2>
+      <p>ZBeast Studio olarak bağımsız geliştirici ekibimizle tamamen ücretsiz ve reklamsız yazılımlar üretiyoruz. Bize bağış yaparak bu projeleri sürdürebilir kılabilirsiniz.</p>
+      <div class="iban-box">
+        <p><strong>İsim:</strong> Süleyman Yörük</p>
+        <p><strong>IBAN:</strong></p>
+        <p class="iban-number" id="ibanText">TR20 0001 0090 1083 3240 8050 01</p>
+        <button class="copy-btn" onclick="copyIBAN()">IBAN'ı Kopyala</button>
+      </div>
+      <p>Destekleriniz için teşekkür ederiz! ❤️</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 ZBeast Studio. Tüm hakları saklıdır.</p>
+    <div aria-label="Sosyal medya bağlantısı">
+      <a href="https://www.instagram.com/zbeaststudio" aria-label="Instagram" target="_blank" rel="noopener noreferrer" class="instagram-logo" tabindex="0" title="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="white" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 1.5A4.25 4.25 0 003.5 7.75v8.5A4.25 4.25 0 007.75 20.5h8.5a4.25 4.25 0 004.25-4.25v-8.5A4.25 4.25 0 0016.25 3.5h-8.5zm8.75 2a1 1 0 110 2 1 1 0 010-2zM12 7a5 5 0 110 10 5 5 0 010-10zm0 1.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z"/>
+        </svg>
+      </a>
+    </div>
+  </footer>
+
+  <script>
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+
+    hamburger.addEventListener('click', () => {
+      const expanded = hamburger.getAttribute('aria-expanded') === 'true' || false;
+      hamburger.setAttribute('aria-expanded', !expanded);
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('open');
+    });
+
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        if(navLinks.classList.contains('open')) {
+          hamburger.classList.remove('active');
+          hamburger.setAttribute('aria-expanded', false);
+          navLinks.classList.remove('open');
+        }
+      });
+    });
+
+    function copyIBAN() {
+      const iban = document.getElementById('ibanText').innerText;
+      navigator.clipboard.writeText(iban).then(() => {
+        alert('IBAN başarıyla kopyalandı!');
+      }, () => {
+        alert('Kopyalama başarısız oldu.');
+      });
+    }
+  </script>
+</body>
+</html>
